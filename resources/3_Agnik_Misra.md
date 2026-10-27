@@ -1,7 +1,7 @@
 # Agnik Misra (2401010044): Slides 6, 7
 
 **Your part:** the features (what the model gets as input), AP-affinity (our own idea), and the feature check.
-**Time:** about 1 minute.
+**Time:** about 2 minutes.
 
 ---
 
@@ -77,22 +77,33 @@ flowchart LR
 
 > **Remember:** 3 feature types → AP-affinity = "where is each router?" → 15.87 → 11.38 m.
 
-### Slide 6: Features
+### Slide 6: Features (1 min)
 
 ![Slide 6](slides/slide-06.png)
 
-> Thank you, Ansh. We give the model 3 types of features: **router signals**, **3 simple stats**, and **AP-affinity, our own idea**.
-> A signal tells how **loud** a router is, but not **where** it is. So we first **learn where each router is** from the training scans.
-> For a new scan, we **average the places** of the routers it hears, and **louder ones count more**.
-> It is learned **only from training data**, so there is **no cheating**.
+> Thank you, Ansh. A model cannot read a scan directly.
+> So we turn it into **features**, which are columns of numbers. We have 3 types:
+> **1. RSSI:** the signal of each router, 464 columns.
+> **2. Stats:** how many routers were heard, the strongest one, and the average. Just 3 columns.
+> **3. AP-affinity, our own idea.**
+> The problem: a signal tells how **loud** a router is, but not **where** it is.
+> So first, we **learn where each router is**, using the training scans where we know the location.
+> We only trust routers heard in at least **5 scans**.
+> Then, for a new scan, we **average the places** of the routers it hears. **Louder ones count more**, because they are closer.
+> This gives the model a hint: "you are **probably in this building, on this floor, near here**."
+> It is learned **only from training data**, again in every fold, so there is **no cheating**.
 
-### Slide 7: Feature check
+### Slide 7: Feature check (45 sec)
 
 ![Slide 7](slides/slide-07.png)
 
-> We kept the **same model** and changed **only the features**.
-> **AP-affinity cut the error from 15.87 to 11.38 m, 28% better.** Our biggest gain.
-> Honestly, **the 3 stats did not help**.
+> Did it help? To check fairly, we kept the **same model** and changed **only the features**.
+> **With AP-affinity: error 15.87 → 11.38 m. That is 28% better.**
+> Floor accuracy also went up, from **78% to 81%**.
+> It helped in **all 5 folds**, not just on average.
+> This was our **biggest gain** in the project.
+> Honestly, **the stats did not help**. The error went slightly up.
+> We kept them because the full set together was best.
 > Now Kartikey will show the models.
 
 ---

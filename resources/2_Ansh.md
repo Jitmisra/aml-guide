@@ -1,7 +1,7 @@
 # Ansh (2401010077): Slides 4, 5
 
 **Your part:** the data, cleaning it, and the fair way of testing (user-group cross-validation).
-**Time:** about 1 minute.
+**Time:** about 2 minutes.
 
 ---
 
@@ -70,21 +70,32 @@ flowchart LR
 
 > **Remember:** 520 routers, only ~18 heard → 100 becomes −110 → 3 cleaning rules → split by user, not randomly.
 
-### Slide 4: The data
+### Slide 4: The data (1 min)
 
 ![Slide 4](slides/slide-04.png)
 
-> Thank you, Gauri. On this map, **dots are training scans** and **crosses are test scans**.
+> Thank you, Gauri. Our dataset is **UJIIndoorLoc**, from a university in Spain.
+> On this map, **dots are training scans** and **crosses are test scans**.
+> There are **3 buildings** with 4 or 5 floors each.
 > There are **520 routers**, but one scan hears only about **18**.
-> "Not heard" was written as **100**, which looks strong, so we changed it to **−110**, meaning **very weak**.
-> The test set was recorded **3 months later**, mostly with **new phones**: a real exam.
+> So almost **97%** of the values are "not heard".
+> The file writes "not heard" as **100**, which looks like a very strong signal. That is wrong.
+> So we changed it to **−110**, which means **very weak**. That is the truth.
+> The test set was recorded **3 months later**, and **9 of its 11 phones are new**.
+> So it is like a **real exam** with new students.
 
-### Slide 5: Cleaning and fair split
+### Slide 5: Cleaning and fair split (1 min)
 
 ![Slide 5](slides/slide-05.png)
 
-> We removed **empty**, **duplicate** and **impossible** scans from the training data only: **19,937 → 18,719**.
-> To test fairly, we use **5-fold cross-validation**, split **by user**, so the test part always has **new people and phones**.
+> First, cleaning. We cleaned **only the training data**, with 3 simple rules.
+> Remove **empty** scans, where nothing was heard.
+> Remove **duplicate** scans, which would count twice.
+> Remove **impossible** readings: −30 dBm or stronger, mostly from one faulty phone.
+> **19,937 → 18,719 scans.** We never touch the test set.
+> Next, how do we test fairly? We use **cross-validation**: 5 parts, train on 4, test on 1, repeated 5 times.
+> But we split **by user**, not randomly, so the test part always has **new people and phones**.
+> Why? With a random split, the same person's scans land on both sides, so it is too easy.
 > A random split promised **3.67 m**, but the real test gave **12.52 m**. **Random splits lie.**
 > Now Agnik will explain the features.
 
