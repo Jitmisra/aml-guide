@@ -197,3 +197,9 @@ A: Random Forest grows trees **independently**, in parallel, and averages them. 
 
 **Q: What does 7.42 m mean in real life?**
 A: The dataset uses map meters; one map meter is about 0.77 real meters, so 7.42 is about 5.7 m on the ground. That is roughly the size of a room.
+
+**Q: Can you write the formulas?**
+A:
+- kNN distance: Euclidean `d = √Σ(rⱼ − r'ⱼ)²`, Manhattan `d = Σ|rⱼ − r'ⱼ|`.
+- Tree split (classification): pick the split that lowers the **Gini impurity** `G = 1 − Σ p_c²` the most. `p_c` is the share of class c in the node; `G = 0` means the node is pure. Regression trees lower the squared error instead.
+- XGBoost: `F_m(x) = F_{m−1}(x) + η·f_m(x)`. Each new tree `f_m` reduces the remaining error, and `η = 0.1` is the learning rate.

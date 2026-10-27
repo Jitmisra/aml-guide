@@ -180,3 +180,8 @@ A: Most predictions are close. A few in building 2 land between corridors, where
 
 **Q: If you had more time in Phase 1, what would you try?**
 A: Ways to handle new phones better, and testing RSSI plus AP-affinity without the signal stats. But we kept Phase 1 simple on purpose.
+
+**Q: Write the error formulas.**
+A: For scan i, with true position (xᵢ, yᵢ) and prediction (x̂ᵢ, ŷᵢ):
+- **2D error** `eᵢ = √((x̂ᵢ − xᵢ)² + (ŷᵢ − yᵢ)²)`, the straight-line distance. The mean 2D error is the average of eᵢ over all scans.
+- **MAE x** `= (1/N) Σ |x̂ᵢ − xᵢ|`, and the same for y.

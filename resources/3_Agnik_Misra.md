@@ -191,3 +191,6 @@ A: It is real. AP-affinity lowered the error in all 5 folds; for example, from 2
 
 **Q: How is this different from kNN?**
 A: kNN compares whole scans with each other. AP-affinity learns about each router separately, and then combines them. It turns "which routers do I hear?" into "where am I probably?".
+
+**Q: The brief said "add missingness indicators" and "scale RSSI". Why didn't you?**
+A: Indicators: −110 already marks "not heard". A tree can split at "below −105", which means exactly "not heard", and `n_heard` counts the heard routers. So separate heard/not-heard columns add nothing for trees. Scaling: trees only use the order of the values, not their size, and all RSSI columns use the same unit (dBm), so kNN treats them fairly. Nothing is ever fitted on the test set. Scaling (fitted on training data only) **will be used in Phase 2**, because neural networks need it.
