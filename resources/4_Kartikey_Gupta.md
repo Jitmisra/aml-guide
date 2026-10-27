@@ -1,7 +1,7 @@
 # Kartikey Gupta (2401010214): Slides 8, 9
 
 **Your part:** the four models, how we tuned them, how we chose the final model, and the test results.
-**Time:** about 1.5 minutes.
+**Time:** about 2 minutes.
 
 ---
 
@@ -72,28 +72,33 @@ flowchart TB
 
 > **Remember:** 4 models × 3 tasks → small tuning → rule fixed first → Random Forest wins, 7.42 m.
 
-### Slide 8: Models and tuning (50 sec)
+### Slide 8: Models and tuning (1 min)
 
 ![Slide 8](slides/slide-08.png)
 
-> Thank you, Agnik. We tried **4 models**. Each has **3 parts**: building, floor and position.
-> **kNN:** copy the most similar old scans.
-> **Random Forest:** many trees **vote together**.
+> Thank you, Agnik. We tried **4 models**.
+> Each has **3 parts**: one for the building, one for the floor, and one for the position.
+> **kNN:** find the most similar old scans and copy their answer.
+> **Random Forest:** **300 trees**, each a chain of yes/no questions. They **vote together**.
 > **XGBoost:** trees added one by one, each **fixing the last one's mistakes**.
-> **Baseline:** a plain Random Forest to compare against.
-> We tried a **few settings** for each and picked the best, using fair cross-validation.
+> **Baseline:** a plain Random Forest with no tuning. It is the bar to beat.
+> We tried a **few settings** for each model: 28 for kNN, 6 for the others.
+> Every setting was checked with the same fair, user-based cross-validation.
 > **Before testing**, we fixed the rule: **lowest error wins**.
-> The winner: **Random Forest**.
+> Random Forest had **11.09 m**, XGBoost 11.25 m, kNN 12.75 m.
+> So the winner is **Random Forest**.
 
-### Slide 9: Test results (40 sec)
+### Slide 9: Test results (1 min)
 
 ![Slide 9](slides/slide-09.png)
 
-> We used the test set **only once**.
+> Now the real exam: **1,111 test scans**, used **only once**.
 > **Random Forest:** building **100%**, floor **92%**, error **7.42 m**.
 > The baseline had **12.52 m**, so we are about **40% better**.
-> **XGBoost** got the most floors right, **95%**.
+> The median error is **5.34 m**, so half of the scans are within about 5 meters.
+> **XGBoost** got the most floors right, **95%**, but its position error was a bit higher.
 > So **no model is best at everything**.
+> That is an important point for Phase 2.
 > Now Lokendra will show where the errors are.
 
 ---
