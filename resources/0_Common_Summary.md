@@ -16,6 +16,16 @@ From **one Wi-Fi scan** on a phone, we guess **which building**, **which floor**
 - But almost every building has Wi-Fi, and a phone can "hear" many Wi-Fi routers (access points) at once.
 - Each router is heard at a different strength depending on where you stand. That pattern works like a **fingerprint of the place**.
 
+## 2b. What one scan looks like
+
+| | WAP001 | WAP002 | WAP003 | ... | WAP520 | → Building | Floor | x, y |
+|---|---|---|---|---|---|---|---|---|
+| Scan | not heard | −45 dBm | not heard | ... | −82 dBm | 1 | 2 | (known) |
+
+- One scan is one row: 520 signal strengths, plus the answer (building, floor, position).
+- **dBm** values are negative, and closer to 0 means stronger: −45 is loud (near), −90 is weak (far).
+- A scan hears only about 18 of the 520 routers; the rest are "not heard".
+
 ## 3. The big picture
 
 ```mermaid
@@ -118,6 +128,21 @@ flowchart LR
 | Slides | PowerPoint (python-pptx) | 11 slides |
 | Running | Makefile | `make all` runs everything |
 | Sharing | Git, GitHub | Team code sharing |
+
+## 9b. The 3 notebooks (what each one shows)
+
+The notebooks do **not** train the models; the script `scripts/run_experiments.py` does that (about 26 min). The notebooks just show each step with a short **What / Why / Result** for every section.
+
+```mermaid
+flowchart LR
+    N1["01 Data quality & EDA<br/>load, clean, campus map,<br/>users & phones, fair split"] --> N2["02 Feature engineering<br/>stats, AP-affinity,<br/>feature check"] --> N3["03 Models & evaluation<br/>tuning, final model, test results,<br/>error analysis, Phase 2 gap"]
+```
+
+| Notebook | Presented by | Key result shown |
+|---|---|---|
+| 01 Data quality & EDA | Ansh | 19,937 → 18,719 scans; random CV 3.67 m vs test 12.52 m |
+| 02 Feature engineering | Agnik | AP-affinity 15.87 → 11.38 m |
+| 03 Models & evaluation | Kartikey (sections 1–4), Lokendra (sections 5–7) | Random Forest 7.42 m; 86% of the error with building + floor right |
 
 ## 10. Who presents what
 

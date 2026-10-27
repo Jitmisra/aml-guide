@@ -1,7 +1,75 @@
 # Agnik Misra (2401010044): Slides 6, 7
 
-**Your part:** the features, AP-affinity (our own idea), and the feature check.
+**Your part:** the features (what the model gets as input), AP-affinity (our own idea), and the feature check.
 **Time:** about 2.5 minutes.
+
+---
+
+## First, understand the idea (diagrams)
+
+### From one scan to 475 input columns
+
+```mermaid
+flowchart LR
+    S["One Wi-Fi scan"] --> R["RSSI: 464 columns<br/>signal of each WAP heard in training<br/>−110 if not heard"]
+    S --> T["Signal stats: 3 columns<br/>n_heard, max_rssi, mean_rssi"]
+    S --> A["AP-affinity: 8 columns<br/>OUR IDEA"]
+    R --> M["Model input: 475 columns"]
+    T --> M
+    A --> M
+```
+
+### AP-affinity in 3 steps
+
+```mermaid
+flowchart TB
+    subgraph L ["LEARN (training scans only)"]
+        L1["For each WAP, look at every training scan that hears it"] --> L2["Profile of the WAP:<br/>which building, which floor, where (x, y)<br/>louder scans count more"]
+        L2 --> L3["Keep only WAPs heard in 5 or more scans<br/>414 WAPs get a profile"]
+    end
+    subgraph U ["USE (any scan, training or test)"]
+        U1["Which WAPs does this scan hear?"] --> U2["Average their profiles<br/>louder WAPs count more"]
+        U2 --> U3["+ location of the loudest known WAP"]
+        U3 --> U4["8 columns"]
+    end
+    L3 --> U1
+```
+
+### A small worked example (made-up numbers)
+
+A new scan hears only two WAPs:
+
+| WAP | Signal | Its learned profile | Weight |
+|---|---|---|---|
+| WAP A | −45 dBm (loud) | building 1, floor 2, at (10, 20) | **0.22** |
+| WAP B | −80 dBm (weak) | building 1, floor 3, at (30, 40) | **0.02** |
+
+The weight formula is `((signal + 105) / 105) ^ e`, so a loud WAP gets a much bigger weight. Here WAP A counts about **10 times more** than WAP B.
+
+- **Building:** both WAPs are in building 1, so aff_b1 = 1.0.
+- **Floor:** (0.22×2 + 0.02×3) / 0.24 ≈ **2.1**, so "probably floor 2".
+- **Location:** (0.22×10 + 0.02×30) / 0.24 ≈ 11.7 and (0.22×20 + 0.02×40) / 0.24 ≈ 21.7, so "probably near (11.7, 21.7)".
+- **Loudest known WAP:** A, at (10, 20).
+
+So the model gets a ready-made hint: **"you are probably in building 1, floor 2, near (11.7, 21.7)"**. The raw RSSI columns alone cannot say that.
+
+### Why there is no cheating (leakage)
+
+```mermaid
+flowchart LR
+    TR["Training folds<br/>(answers known)"] -->|"learn profiles"| P["WAP profiles"]
+    P -->|"only transform"| HO["Held-out fold / test scans<br/>(answers hidden)"]
+```
+
+The profiles are rebuilt **inside every CV fold** from the training part only. A test scan's true location is never used to build its own features.
+
+### Feature check result
+
+```mermaid
+flowchart LR
+    A["RSSI only<br/>15.55 m"] -->|"+ stats"| B["RSSI + stats<br/>15.87 m<br/>(no help)"]
+    B -->|"+ AP-affinity"| C["RSSI + stats + AP-affinity<br/>11.38 m<br/>(28% better!)"]
+```
 
 ---
 
@@ -11,82 +79,107 @@
 
 ![Slide 6](slides/slide-06.png)
 
-> Thank you, Ansh. A model cannot use a scan directly, so we turn it into **features**, which means columns of numbers. We have three kinds.
-> **First, RSSI:** one column per access point, 464 in total. Each column is just the signal strength, with −110 for "not heard".
-> **Second, three signal statistics:** how many access points were heard, the strongest reading, and the average reading.
-> **Third, AP-affinity, which is our own idea.** A raw column tells how *loud* a router is, but not *where* it is. So we do it in three steps.
-> **Step 1:** for each access point, we look at all the training scans that hear it and learn its usual building, floor and location. We call this its profile. We only trust access points heard in at least 5 scans.
-> **Step 2:** for a new scan, we take the average of the profiles of the access points it hears. Stronger signals count more, because a loud router is probably close.
-> **Step 3:** we also add the location of the strongest known access point.
-> That gives 8 new columns. They are learned **only from training data**, inside every fold, so a test scan never shapes its own features.
+> Thank you, Ansh. A model cannot understand a scan directly, so we turn it into **features**, which means columns of numbers the model learns from. We have three kinds.
+> **First, RSSI:** one column for each access point heard in training, which is **464 columns**. Each column is just the signal strength, with −110 when it was not heard.
+> **Second, three signal statistics:** how many access points the scan heard, the strongest reading, and the average of the heard readings. These give a quick summary of the scan.
+> **Third, AP-affinity, which is our own idea.** The problem with raw RSSI is that a column tells the model how *loud* a router is, but not *where* that router is. So we teach that in three steps.
+> **Step 1:** for each access point, we look at all the training scans that hear it. Since we know where those scans were taken, we learn the router's usual **building, floor and location**. We call this its **profile**. We only trust routers heard in at least **5 scans**, so 414 routers get a profile.
+> **Step 2:** for any new scan, we take the **average of the profiles** of the routers it hears. **Louder routers count more**, because a loud router is probably close to you.
+> **Step 3:** we also add the location of the **loudest known router**.
+> That gives **8 new columns**, which work like a ready-made hint: "you are probably in this building, on this floor, near this spot."
+> Very important: the profiles are learned **only from training scans**, and rebuilt inside every cross-validation fold. So a test scan's answer never goes into its own features. There is no cheating.
 
 ### Slide 7: Feature check (about 1 min)
 
 ![Slide 7](slides/slide-07.png)
 
-> Did it help? We kept the same Baseline Random Forest and changed only the features, scored with user-group cross-validation.
-> **Adding AP-affinity:** the error went from **15.87 m to 11.38 m**, which is 28% lower, and floor accuracy went from 78.0% to 80.6%. That was our biggest gain.
-> To be honest, the **signal statistics did not help**: the error went slightly up, from 15.55 to 15.87 m.
-> We still kept them, because the full set together scored best.
+> Did these features actually help? To check fairly, we kept the **same model**, the Baseline Random Forest, and changed **only the features**, scored with user-group cross-validation.
+> **Adding AP-affinity** brought the error down from **15.87 m to 11.38 m**, which is **28% lower**, and floor accuracy went up from 78.0% to 80.6%. It also helped in **all 5 folds**, not just on average. This was our **biggest gain** in the whole project.
+> To be honest, the **signal statistics did not help**. The error went slightly up, from 15.55 to 15.87 m. We still kept them, because the full set together scored best.
 > Now Kartikey will show the models.
 
 ---
 
 ## Words you should know
 
-| Word | Simple meaning |
-|---|---|
-| **Feature** | One input column the model uses |
-| **Feature engineering** | Making new, more useful columns from the raw data |
-| **RSSI features** | The 464 signal-strength columns (WAPs heard in training) |
-| **n_heard** | How many access points the scan heard |
-| **max_rssi** | The strongest reading in the scan |
-| **mean_rssi** | The average of the heard readings |
-| **AP-affinity** | Our feature: where the access points a scan hears usually are |
-| **Profile** | For one WAP: its usual building (3 shares), floor, and location (x, y) |
-| **Weighted average** | An average where some values count more. Here, stronger signals count more |
-| **Powed weight** | The weight formula `((rssi + 105) / 105) ^ e`. Roughly 0.27 at −40 dBm, 0.05 at −70 and almost 0 at −100. Taken from the UJIIndoorLoc authors (2015) |
-| **Min support = 5** | A WAP needs at least 5 training scans, or its profile is not reliable |
-| **Strongest known WAP** | The loudest WAP in the scan that has a profile |
-| **Leakage** | The answer sneaking into the input. We avoid it by learning profiles only from training rows |
+| Word | Simple meaning | Example / our number |
+|---|---|---|
+| **Feature** | One input column the model learns from | "Signal of WAP 12" is one feature |
+| **Feature engineering** | Creating new, more useful columns from the raw data | We created AP-affinity |
+| **Feature set** | A group of features used together | rssi / rssi+stats / rssi+stats+affinity |
+| **RSSI features** | The raw signal strength columns | 464 columns |
+| **n_heard** | How many WAPs the scan heard | 17 |
+| **max_rssi** | The strongest reading in the scan; tells how close the nearest router is | −46 dBm |
+| **mean_rssi** | The average of only the heard readings | −75 dBm |
+| **AP-affinity** | Our feature: where the WAPs that a scan hears usually are | 8 columns |
+| **Profile** | What we learned about one WAP: its building shares, average floor and average location | WAP A: building 1, floor 2, at (10, 20) |
+| **Building shares** | What fraction of a WAP's (weighted) scans come from each building | 0.9 in building 1, 0.1 in building 2 |
+| **Weighted average** | An average where some items count more than others | Loud WAPs count more |
+| **Powed weight** | Our weight formula `((rssi + 105)/105)^e`, taken from the dataset's authors (2015) | About 0.27 at −40, 0.05 at −70, almost 0 at −100 |
+| **e** | The math constant 2.718 used as the power | Makes loud signals count much more |
+| **Min support = 5** | A WAP must be heard in at least 5 training scans to get a profile | Fewer scans would give an unreliable profile |
+| **Strongest known WAP** | The loudest WAP in the scan that has a profile | Its location goes into 2 columns |
+| **fit / transform** | fit = learn from training data; transform = apply what was learned to any data | Profiles are fit on training rows, then transform test scans |
+| **Data leakage** | The answer sneaking into the input, which makes scores look fake-good | Avoided: profiles come from training rows only |
+| **Nested feature sets** | Each set adds a block to the previous one | rssi ⊂ rssi+stats ⊂ rssi+stats+affinity |
+| **Feature check** | Same model, change only the features, and compare the scores | Done with the Baseline RF |
 
 ### The 8 AP-affinity columns
 
 | Column | Meaning |
 |---|---|
-| aff_b0, aff_b1, aff_b2 | How much the heard WAPs "belong" to building 0, 1 and 2 |
+| aff_b0, aff_b1, aff_b2 | How strongly the heard WAPs "belong" to building 0, 1 and 2 |
 | aff_floor | The average floor of the heard WAPs |
-| aff_lon, aff_lat | The average location of the heard WAPs |
-| aff_top_lon, aff_top_lat | The location of the strongest known WAP |
+| aff_lon, aff_lat | The average location (x, y) of the heard WAPs |
+| aff_top_lon, aff_top_lat | The location (x, y) of the loudest known WAP |
 
 ## What you made / worked on
 
-- **The feature code** (`src/indoorloc/features.py`): the signal statistics, the `APAffinity` class with fit and transform, and the `FeatureBuilder`.
-- **Notebook 02**: feature engineering and the feature check.
-- **The feature check experiment** (`results/metrics/feature_check.csv`) and its figure.
+- **The feature code** (`src/indoorloc/features.py`):
+  - `signal_stats`: the 3 statistics.
+  - `APAffinity`: learns the profiles (fit) and makes the 8 columns (transform).
+  - `FeatureBuilder`: puts together whichever feature set is asked for.
+- **Notebook 02** (described below).
+- **The feature check** (`results/metrics/feature_check.csv`) and its bar chart.
+
+## Your notebook: 02 Feature engineering
+
+| Section | What it shows | Main result |
+|---|---|---|
+| 1. Three feature sets | Builds the 3 sets from the training data | 464, 467 and 475 columns |
+| 2. Signal statistics | n_heard, max_rssi and mean_rssi for 3 sample scans | They hear 17, 16, 15 WAPs |
+| 3. AP-affinity profiles | How many WAPs get a profile, and the profile of the most-heard WAP | 414 WAPs have a profile |
+| 4. AP-affinity of one test scan | The 8 columns of one random test scan next to its true answer | The hint points to the right building and nearly the right floor |
+| 5. Feature check | Bar chart and table: the same model on the 3 sets | AP-affinity 15.87 → 11.38 m; stats no help |
 
 ## Questions they may ask you
 
-**Q: What is AP-affinity in one line?**
-A: It tells the model where the routers a scan hears usually are, so the model gets a "where" clue and not just a "how loud" clue.
+**Q: Explain AP-affinity in one line.**
+A: It tells the model *where* the routers a scan hears usually are, so the model gets a location hint and not just signal strengths.
 
-**Q: Is it cheating, or leakage?**
-A: No. Profiles are learned only from training rows, and rebuilt in every CV fold. A held-out or test scan's true location never goes into its own features. We judge it only on held-out folds and the test set.
+**Q: Is it cheating or leakage?**
+A: No. Profiles are learned only from training rows, and rebuilt in every CV fold. A held-out or test scan's true location never enters its own features. We judge it only on held-out folds and the test set.
 
-**Q: Why do stronger signals count more?**
-A: A loud router is probably close to you, so its location says more about where you are.
+**Q: Why do loud signals count more?**
+A: A loud router is probably close to you, so its location says more about where you are. A very weak one could be far away.
 
 **Q: Why at least 5 scans?**
-A: With only 1 or 2 scans, the profile could be badly wrong. 5 is a simple safe minimum.
+A: A profile built from 1 or 2 scans could be badly wrong. 5 is a simple, safe minimum.
 
-**Q: What if a scan hears no known WAP?**
-A: It gets the training average values. This is rare.
+**Q: What if a scan hears no WAP with a profile?**
+A: It gets the training average values. This is very rare.
 
-**Q: Why the exponent e?**
-A: It comes from the "powed" formula suggested by the dataset's authors (Torres-Sospedra et al., 2015). We did not tune it.
+**Q: Why −105 in the formula?**
+A: It is 1 dB below the weakest real training reading (−104). So even the weakest real signal gets a small positive weight, and "not heard" (−110) gets no weight.
+
+**Q: Why the power e?**
+A: It comes from the "powed" formula suggested by the dataset's own authors (Torres-Sospedra et al., 2015). We did not tune it.
 
 **Q: The stats did not help. Why keep them?**
-A: The feature sets were tested in a nested way (rssi → +stats → +affinity), and the full set scored best. We did not test RSSI plus AP-affinity without the stats. We say this honestly.
+A: The feature sets were tested in order (rssi → +stats → +affinity), and the full set scored best. We did not test RSSI plus AP-affinity without the stats, and we say that honestly.
 
-**Q: Is the gain real, or just luck?**
-A: AP-affinity lowered the error in **all 5 folds**, not just on average.
+**Q: Is the gain real, or luck?**
+A: It is real. AP-affinity lowered the error in all 5 folds; for example, from 24.53 to 18.35 m on the hardest fold.
+
+**Q: How is this different from kNN?**
+A: kNN compares whole scans with each other. AP-affinity learns about each router separately, and then combines them. It turns "which routers do I hear?" into "where am I probably?".

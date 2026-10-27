@@ -1,7 +1,67 @@
 # Lokendra Singh (2401010254): Slides 10, 11
 
-**Your part:** where the errors are, the Phase 2 gap, and the closing.
+**Your part:** where the final model still makes mistakes (error analysis), the gap, Phase 2, and the closing.
 **Time:** about 2 minutes.
+
+---
+
+## First, understand the idea (diagrams)
+
+### Splitting the test scans into 3 cases
+
+```mermaid
+flowchart TB
+    ALL["1,111 test scans<br/>(Random Forest predictions)"] --> C1["Building wrong<br/>0 scans"]
+    ALL --> C2["Building right, floor wrong<br/>87 scans (7.8%)<br/>error 13.06 m"]
+    ALL --> C3["Both right<br/>1,024 scans (92.2%)<br/>error 6.94 m"]
+```
+
+### Where the total error comes from
+
+```mermaid
+pie showData
+    title Share of the total position error
+    "Building + floor right" : 86.2
+    "Floor wrong" : 13.8
+    "Building wrong" : 0
+```
+
+**Lesson:** the floor mistakes are costly, but rare. Most of the error comes from the **fine position** on the correct floor.
+
+### Floor mistakes are small
+
+```mermaid
+pie showData
+    title The 87 floor mistakes
+    "Off by 1 floor" : 81
+    "Off by 2 or more" : 6
+```
+
+### Seen vs new phones
+
+```mermaid
+flowchart LR
+    S["Phones seen in training<br/>2 phones, 397 scans"] --> S2["5.84 m error<br/>93.7% floors"]
+    N["New phones<br/>9 phones, 714 scans"] --> N2["8.30 m error<br/>91.3% floors"]
+```
+
+### Phase 1 vs Phase 2
+
+```mermaid
+flowchart TB
+    subgraph P1 ["Phase 1 (now): 3 separate models"]
+        a["Scan"] --> b1["Building model"]
+        a --> b2["Floor model"]
+        a --> b3["Position model"]
+    end
+    subgraph P2 ["Phase 2 (next): one multi-task neural network"]
+        s["Scan"] --> sh["Shared layers<br/>learn common patterns"]
+        sh --> h1["Building head"]
+        sh --> h2["Floor head"]
+        sh --> h3["Position head"]
+    end
+    P1 -->|"gap: they share nothing"| P2
+```
 
 ---
 
@@ -11,41 +71,47 @@
 
 ![Slide 10](slides/slide-10.png)
 
-> Thank you, Kartikey. Now let's see where our final Random Forest still makes mistakes on the test set.
-> The **building is never wrong**: 0 mistakes.
-> The floor is wrong for only **7.8%** of the scans. Those scans have a bigger error, 13.06 m, but there are few of them.
-> The surprising part: **86% of the total error** is on scans where the building and floor are already right. So the main problem is the **fine position** inside the floor.
-> Also, **81 of the 87 floor mistakes are just one floor off**, up or down.
-> And **new phones are harder**: 8.30 m error, against 5.84 m on phones seen in training.
+> Thank you, Kartikey. A total score does not tell us **what to fix**, so we looked at **where** our final Random Forest still makes mistakes on the test set. We split the 1,111 test scans into three cases.
+> **First case: building wrong. Zero scans.** The building is never wrong.
+> **Second case: building right, floor wrong.** Only **7.8%** of the scans. These are costly, at 13.06 m of error, because a wrong floor also confuses the position. But they are rare.
+> **Third case: both right.** That is 92.2% of the scans, at 6.94 m of error. The surprising part is that this case causes **86% of all the error**. So the main problem left is the **fine position on the correct floor**.
+> Two more findings. **81 of the 87 floor mistakes are just one floor off**, up or down, which makes sense because nearby floors hear similar routers. And **new phones are harder**: 8.30 m of error, against 5.84 m on phones seen in training, because different phones measure signal strength a little differently.
 
 ### Slide 11: Phase 2 gap and closing (about 1 min)
 
 ![Slide 11](slides/slide-11.png)
 
-> So what did Phase 1 show?
-> AP-affinity helped most. There is no single best model: Random Forest is best for position and XGBoost for floors. And most of the error is in fine position.
-> **The gap:** our three task models share nothing. AP-affinity shares location knowledge between them, but only by hand.
-> **Phase 2:** we will build **one multi-task neural network**, with shared layers and three outputs, for building, floor and position, so the tasks can learn from each other. We will use the same split, the same test set and the same metrics, so we can compare fairly with Phase 1.
-> Thank you! We are happy to take questions.
+> So, what did Phase 1 show?
+> **One:** AP-affinity, our own feature, helped the most, cutting the error from 15.87 to 11.38 m.
+> **Two:** no single model is best at everything: Random Forest is best for position, and XGBoost is best for floors.
+> **Three:** most of the error is fine position.
+> **The gap:** our three task models are separate and **share nothing**, but the tasks are clearly related. Knowing the floor helps the position, and the other way round. AP-affinity shares that knowledge, but only **by hand**.
+> So in **Phase 2** we will build **one multi-task neural network**: **shared layers** that learn common patterns from the scan, then **three heads** for building, floor and position, so the tasks learn from each other. We will use the **same split, the same test set and the same metrics**, so the comparison with Phase 1 is fair.
+> Thank you! We are happy to take your questions.
 
 ---
 
 ## Words you should know
 
-| Word | Simple meaning |
-|---|---|
-| **Error analysis** | Looking at *where* and *why* the model is wrong, not just the total score |
-| **Error breakdown** | Splitting the scans into 3 cases: building wrong / floor wrong / both right |
-| **Share of error** | How much of the total error comes from one case |
-| **Floor confusion (matrix)** | A table of true floor against predicted floor, showing which floors get mixed up |
-| **Seen vs new phones** | Phones that were in training (2) against phones never seen (9) |
-| **Phase 2** | The next part of the course, using deep learning |
-| **Neural network** | A model made of layers of simple units that learn patterns |
-| **Multi-task learning** | One model learning several related tasks together (Caruana, 1997) |
-| **Shared layers** | The part of the network used by all three tasks |
-| **Output heads** | The 3 final parts: one each for building, floor and position |
+| Word | Simple meaning | Example / our number |
+|---|---|---|
+| **Error analysis** | Looking at *where* and *why* the model is wrong, not just the total score | Our 3-case breakdown |
+| **Error breakdown** | Splitting the scans into cases and measuring each case | Building wrong / floor wrong / both right |
+| **Share of scans** | What % of the scans fall in a case | Floor wrong: 7.8% |
+| **Share of error** | What % of the *total* error comes from a case | Both right: 86.2% |
+| **Confusion matrix** | A table of true vs predicted classes; the diagonal = correct | True floor 1, predicted floor 2: 29 scans in building 1 |
+| **Floor confusion** | The confusion matrix for floors, one per building | Most mistakes are next to the diagonal (±1 floor) |
+| **Seen phone** | A phone model that was also in training | 2 phones, 397 test scans |
+| **New phone** | A phone never seen in training | 9 phones, 714 test scans |
+| **Device heterogeneity** | Different phones read the same signal differently | Why new phones are harder |
+| **Error map** | The campus map with each prediction coloured by its error | A few large errors in building 2 |
+| **Neural network** | A model made of layers of simple units that learn patterns | Phase 2 |
+| **Multi-task learning** | One model learning several related tasks together (Caruana, 1997) | Building + floor + position |
+| **Shared layers** | The part of the network that all three tasks use together | Learns common patterns once |
+| **Output head** | A small final part that gives one answer | Building head, floor head, position head |
+| **Phase 2** | The next part of the course: deep learning, compared fairly with Phase 1 | Same split, test and metrics |
 
-### The numbers (Random Forest, test set)
+### Your key numbers (Random Forest, test set)
 
 | Case | Scans | Share of scans | Mean error | Share of total error |
 |---|---:|---:|---:|---:|
@@ -60,30 +126,48 @@
 
 ## What you made / worked on
 
-- **The metrics code** (`src/indoorloc/metrics.py`): the per-scan errors, the error breakdown, the per-phone results and the floor confusion.
+- **The metrics code** (`src/indoorloc/metrics.py`): the error of each scan, the 3-case breakdown, seen vs new phones, and floor confusion.
 - **The figures** (`src/indoorloc/plots.py`): 7 charts, including the floor confusion and the error map.
-- **Notebook 03**: the ML models and the evaluation.
-- **The Phase 2 plan**, and the conclusion of the report.
+- **The error analysis results:** `error_breakdown.csv`, `per_phone.csv` and `floor_confusion.csv`.
+- **The Phase 2 plan** and the report's conclusion.
+
+## Your notebook: 03 Models & evaluation (sections 5–7)
+
+The notebook only reads saved results; it does not train anything.
+
+| Section | What it shows | Main result |
+|---|---|---|
+| 5. Where the error comes from | The 3-case table + the seen vs new phones table | 0 building errors; 86.2% of the error with both right |
+| 6. Floor confusion + error map | True vs predicted floor for each building, and a map of the errors | Mistakes are ±1 floor, mostly in building 1 |
+| 7. The Phase 2 gap | A short text on why one shared network is next | No model is best at all tasks |
+
+(Sections 1–4 are Kartikey's part.)
 
 ## Questions they may ask you
 
 **Q: What is the main problem left?**
 A: Fine position. 86% of the error is on scans where the building and floor are already right.
 
-**Q: Why is a wrong floor costly?**
-A: If the floor is wrong, the position model is often confused too: 13.06 m error, against 6.94 m when everything is right.
+**Q: Why is a wrong floor so costly?**
+A: The position model gets confused too, because floors stacked on top of each other hear similar routers. The error is 13.06 m, against 6.94 m when everything is right.
+
+**Q: Why are most floor mistakes only one floor off?**
+A: Wi-Fi passes through ceilings, so floors right next to each other hear almost the same routers. Floors further apart sound more different.
 
 **Q: Why are new phones worse?**
-A: Different phones measure signal strength a bit differently, so the same place can "look" different to a new phone.
+A: Different phones have different antennas and chips, so the same spot can "look" slightly different to a new phone.
 
 **Q: Where do most floor mistakes happen?**
-A: 81 of the 87 are one floor off, and 51 of the 87 are in building 1.
+A: In building 1: 51 of the 87. The most common one is floor 1 predicted as floor 2 (29 scans).
 
-**Q: What will Phase 2 change?**
-A: One neural network with shared layers learns all three tasks together, instead of three separate models. It will be compared with Phase 1 using the same split, test set and metrics.
+**Q: What exactly will Phase 2 change?**
+A: Instead of three separate models, one neural network with shared layers learns all three tasks together. We will compare it with Phase 1 using the same split, test set and metrics.
 
 **Q: Why do you think multi-task will help?**
-A: The tasks are related: knowing the floor helps the position, and the reverse. In Phase 1, AP-affinity shared this knowledge by hand and gave our biggest gain. A shared network can learn that sharing by itself. Kim et al. (2018) already trained one network like this on the same dataset.
+A: The tasks are related. In Phase 1, AP-affinity shared location knowledge by hand and gave our biggest gain. A shared network can learn that sharing by itself. Kim et al. (2018) already trained one network like this on the same dataset.
 
 **Q: What does the error map show?**
-A: Most predictions are close. A few in building 2 land between corridors, where no scan was ever taken. The model probably averages places it cannot tell apart.
+A: Most predictions are close. A few in building 2 land between corridors, where no scan was ever taken. The model probably averages two places it cannot tell apart.
+
+**Q: If you had more time in Phase 1, what would you try?**
+A: Ways to handle new phones better, and testing RSSI plus AP-affinity without the signal stats. But we kept Phase 1 simple on purpose.
