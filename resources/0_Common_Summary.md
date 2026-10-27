@@ -142,7 +142,7 @@ flowchart LR
 |---|---|---|
 | 01 Data quality & EDA | Ansh | 19,937 → 18,719 scans; random CV 3.67 m vs test 12.52 m |
 | 02 Feature engineering | Agnik | AP-affinity 15.87 → 11.38 m |
-| 03 Models & evaluation | Kartikey (sections 1–4), Lokendra (sections 5–7) | Random Forest 7.42 m; 86% of the error with building + floor right |
+| 03 Models & evaluation | Kartikey (sections 1–4), Lokendra (sections 5–9) | Random Forest 7.42 m; 86% of the error with building + floor right |
 
 ## 10. Who presents what
 

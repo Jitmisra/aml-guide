@@ -140,7 +140,7 @@ flowchart TB
 - **The error analysis results:** `error_breakdown.csv`, `per_phone.csv` and `floor_confusion.csv`.
 - **The Phase 2 plan** and the report's conclusion.
 
-## Your notebook: 03 Models & evaluation (sections 5–7)
+## Your notebook: 03 Models & evaluation (sections 5–9)
 
 The notebook only reads saved results; it does not train anything.
 
@@ -148,7 +148,9 @@ The notebook only reads saved results; it does not train anything.
 |---|---|---|
 | 5. Where the error comes from | The 3-case table + the seen vs new phones table | 0 building errors; 86.2% of the error with both right |
 | 6. Floor confusion + error map | True vs predicted floor for each building, and a map of the errors | Mistakes are ±1 floor, mostly in building 1 |
-| 7. The Phase 2 gap | A short text on why one shared network is next | No model is best at all tasks |
+| 7. How the errors are spread | For all 4 models: share of scans within each error (a curve) | RF: 48% within 5 m, 76% within 10 m |
+| 8. Final model per building | Floor accuracy and error in each building | Building 1 hardest: 83.4% floors, 9.22 m |
+| 9. The Phase 2 gap | A short text on why one shared network is next | No model is best at all tasks |
 
 (Sections 1–4 are Kartikey's part.)
 

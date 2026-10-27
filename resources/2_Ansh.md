@@ -141,6 +141,8 @@ flowchart LR
 | 5. Scans per floor | How many scans each of the 13 floors has | Every floor has data; the test mix is different |
 | 6. Users and phones | Which users shared a phone | 18 users → 16 groups |
 | 7. Fair split | Which users each fold holds out, plus the CV-check table | Random 3.67 m vs test 12.52 m |
+| 8. Signal strengths | Histogram of real readings + which phones give ≥ −30 dBm | −104 to 0 dBm; 430 of 508 from phone 19 |
+| 9. Missing values, scans per floor | Empty-cell count + scans per building/floor table | No empty cells; every floor ≥ 508 scans |
 
 ## Questions they may ask you
 

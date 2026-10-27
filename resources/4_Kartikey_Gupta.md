@@ -167,7 +167,7 @@ The notebook does **not** train the models, because that takes 26 minutes. It on
 | 3. CV results + final model | The CV scores of all models and the rule | Random Forest 11.09 m wins |
 | 4. Test results | The test table + a chart of CV vs test for each model | RF 7.42 m, XGBoost floors 95.2% |
 
-(Sections 5–7 are Lokendra's part.)
+(Sections 5–9 are Lokendra's part.)
 
 ## Questions they may ask you
 

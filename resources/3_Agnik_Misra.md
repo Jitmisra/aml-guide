@@ -159,6 +159,8 @@ flowchart LR
 | 3. AP-affinity profiles | How many WAPs get a profile, and the profile of the most-heard WAP | 414 WAPs have a profile |
 | 4. AP-affinity of one test scan | The 8 columns of one random test scan next to its true answer | The hint points to the right building and nearly the right floor |
 | 5. Feature check | Bar chart and table: the same model on the 3 sets | AP-affinity 15.87 → 11.38 m; stats no help |
+| 6. The weight curve | How much each reading counts in AP-affinity | 0.27 at −40, 0.05 at −70, ~0 at −100 |
+| 7. AP-affinity alone | Use the 8 columns directly on the test set, no model | 99.9% building, 77.3% floor, 14.2 m |
 
 ## Questions they may ask you
 
