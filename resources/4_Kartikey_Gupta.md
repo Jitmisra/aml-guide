@@ -1,7 +1,7 @@
 # Kartikey Gupta (2401010214): Slides 8, 9
 
 **Your part:** the four models, how we tuned them, how we chose the final model, and the test results.
-**Time:** about 2.5 minutes.
+**Time:** about 1.5 minutes.
 
 ---
 
@@ -70,27 +70,31 @@ flowchart TB
 
 ## Your script
 
-### Slide 8: Models and tuning (about 1.5 min)
+> **Remember:** 4 models × 3 tasks → small tuning → rule fixed first → Random Forest wins, 7.42 m.
+
+### Slide 8: Models and tuning (50 sec)
 
 ![Slide 8](slides/slide-08.png)
 
-> Thank you, Agnik. Now the models. We compared four. Each one is really **three separate models**: a classifier for the building, a classifier for the floor, and a regressor for the x-y position.
-> **kNN**, or k-nearest neighbours, is the simplest. It finds the k training scans that look most similar to the new scan and copies their answer: a vote for the floor, an average for the position. It only uses the raw RSSI.
-> **Random Forest** builds **300 decision trees**. Each tree is a chain of yes/no questions, like "is router 12 louder than −70?". Each tree sees a random part of the data, and then they all vote or average. Many trees together make fewer mistakes than one.
-> **XGBoost** is boosting. It adds trees **one after another**, and each new tree tries to fix the mistakes of the earlier trees.
-> **Baseline RF** is just a plain Random Forest with default settings and no tuning. It is the bar to beat.
-> Random Forest and XGBoost get all the features, including Agnik's AP-affinity.
-> Then **tuning**: we tried small grids of settings, **28 for kNN and 6 each** for Random Forest and XGBoost. Every setting was scored with the same user-group cross-validation, and each task keeps its own best setting.
-> **Before** looking at the test set, we fixed one rule: **the model with the lowest cross-validation position error wins**. Random Forest had 11.09 m, XGBoost 11.25 m and kNN 12.75 m. So our final model is **Random Forest**.
+> Thank you, Agnik. We tried **4 models**. Each has **3 parts**: building, floor and position.
+> **kNN:** copy the most similar old scans.
+> **Random Forest:** many trees **vote together**.
+> **XGBoost:** trees added one by one, each **fixing the last one's mistakes**.
+> **Baseline:** a plain Random Forest to compare against.
+> We tried a **few settings** for each and picked the best, using fair cross-validation.
+> **Before testing**, we fixed the rule: **lowest error wins**.
+> The winner: **Random Forest**.
 
-### Slide 9: Test results (about 1 min)
+### Slide 9: Test results (40 sec)
 
 ![Slide 9](slides/slide-09.png)
 
-> Now the real exam. Each model is trained on all 18,719 training scans, and then tested **only once** on the 1,111 test scans.
-> **Random Forest**, our final model, has the lowest error: on average **7.42 m** from the true spot, compared with 12.52 m for the baseline, so about 40% better. The median is 5.34 m, which means half of the scans are within 5.34 m. It got the **building right 100%** of the time and the **floor 92.2%**.
-> **XGBoost** got the most floors right, **95.2%**, but its position error was a little worse, 7.86 m.
-> So **no single model is best at everything**, and that leads to our Phase 2 idea. Lokendra will now show where the errors come from.
+> We used the test set **only once**.
+> **Random Forest:** building **100%**, floor **92%**, error **7.42 m**.
+> The baseline had **12.52 m**, so we are about **40% better**.
+> **XGBoost** got the most floors right, **95%**.
+> So **no model is best at everything**.
+> Now Lokendra will show where the errors are.
 
 ---
 

@@ -1,7 +1,7 @@
 # Agnik Misra (2401010044): Slides 6, 7
 
 **Your part:** the features (what the model gets as input), AP-affinity (our own idea), and the feature check.
-**Time:** about 2.5 minutes.
+**Time:** about 1.5 minutes.
 
 ---
 
@@ -75,27 +75,29 @@ flowchart LR
 
 ## Your script
 
-### Slide 6: Features (about 1.5 min)
+> **Remember:** 3 feature types → AP-affinity = "where is each router?" → 15.87 → 11.38 m.
+
+### Slide 6: Features (50 sec)
 
 ![Slide 6](slides/slide-06.png)
 
-> Thank you, Ansh. A model cannot understand a scan directly, so we turn it into **features**, which means columns of numbers the model learns from. We have three kinds.
-> **First, RSSI:** one column for each access point heard in training, which is **464 columns**. Each column is just the signal strength, with −110 when it was not heard.
-> **Second, three signal statistics:** how many access points the scan heard, the strongest reading, and the average of the heard readings. These give a quick summary of the scan.
-> **Third, AP-affinity, which is our own idea.** The problem with raw RSSI is that a column tells the model how *loud* a router is, but not *where* that router is. So we teach that in three steps.
-> **Step 1:** for each access point, we look at all the training scans that hear it. Since we know where those scans were taken, we learn the router's usual **building, floor and location**. We call this its **profile**. We only trust routers heard in at least **5 scans**, so 414 routers get a profile.
-> **Step 2:** for any new scan, we take the **average of the profiles** of the routers it hears. **Louder routers count more**, because a loud router is probably close to you.
-> **Step 3:** we also add the location of the **loudest known router**.
-> That gives **8 new columns**, which work like a ready-made hint: "you are probably in this building, on this floor, near this spot."
-> Very important: the profiles are learned **only from training scans**, and rebuilt inside every cross-validation fold. So a test scan's answer never goes into its own features. There is no cheating.
+> Thank you, Ansh. The model needs **features**, which are columns of numbers. We have 3 types:
+> **1. RSSI:** the signal of each router, 464 columns.
+> **2. Stats:** how many routers were heard, the strongest one, and the average.
+> **3. AP-affinity, our own idea.**
+> A signal says how **loud** a router is, but not **where** it is.
+> So first we **learn where each router is**, from the training scans.
+> Then, for a new scan, we **average the places** of the routers it hears. **Louder ones count more.**
+> This gives the model a hint: "you are **probably here**."
+> It is learned **only from training data**, so **no cheating**.
 
-### Slide 7: Feature check (about 1 min)
+### Slide 7: Feature check (30 sec)
 
 ![Slide 7](slides/slide-07.png)
 
-> Did these features actually help? To check fairly, we kept the **same model**, the Baseline Random Forest, and changed **only the features**, scored with user-group cross-validation.
-> **Adding AP-affinity** brought the error down from **15.87 m to 11.38 m**, which is **28% lower**, and floor accuracy went up from 78.0% to 80.6%. It also helped in **all 5 folds**, not just on average. This was our **biggest gain** in the whole project.
-> To be honest, the **signal statistics did not help**. The error went slightly up, from 15.55 to 15.87 m. We still kept them, because the full set together scored best.
+> Did it help? Same model, only the features changed.
+> **AP-affinity: error 15.87 → 11.38 m. That is 28% better.** Our biggest gain.
+> Honestly, **the stats did not help**.
 > Now Kartikey will show the models.
 
 ---

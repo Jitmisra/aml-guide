@@ -1,7 +1,7 @@
 # Ansh (2401010077): Slides 4, 5
 
 **Your part:** the data, cleaning it, and the fair way of testing (user-group cross-validation).
-**Time:** about 2.5 minutes.
+**Time:** about 1.5 minutes.
 
 ---
 
@@ -68,29 +68,27 @@ flowchart LR
 
 ## Your script
 
-### Slide 4: The data (about 1 min)
+> **Remember:** 520 routers, only ~18 heard → 100 becomes −110 → 3 cleaning rules → split by user, not randomly.
+
+### Slide 4: The data (40 sec)
 
 ![Slide 4](slides/slide-04.png)
 
-> Thank you, Gauri. Our dataset is **UJIIndoorLoc**, from a university in Spain.
-> On this map, the **coloured dots** are where the training scans were taken, and the **black crosses** are the test scans. There are **3 buildings** with 4 or 5 floors each, which gives **13 building-floor combinations**.
-> There are **520 access points**, but one scan hears only about **18** of them on average. So almost **97%** of all the readings are "not heard". The data is very sparse.
-> The file writes "not heard" as **100**. That is a problem, because to a model 100 looks stronger than any real signal. So we replaced it with **−110 dBm**, which is weaker than the weakest real reading of −104. Now "not heard" means "very weak", which is the truth.
-> The training data was recorded in **May–June 2013**, and the test set about **3 months later, in September–October**. The test set has 11 phones, and **9 of them are new**, never seen in training. So it is like a real exam with new students.
-> One small note: the positions are in map units, and one data meter is about 0.77 real meters.
+> Thank you, Gauri. On this map, **dots are training scans** and **crosses are test scans**.
+> There are **520 routers**, but one scan hears only about **18**.
+> The file writes "not heard" as **100**, which looks like a strong signal. That is wrong.
+> So we changed it to **−110**, which means **very weak**.
+> The test set was recorded **3 months later**, mostly with **new phones**. A real exam.
 
-### Slide 5: Cleaning and fair split (about 1.5 min)
+### Slide 5: Cleaning and fair split (50 sec)
 
 ![Slide 5](slides/slide-05.png)
 
-> First, cleaning. We cleaned **only the training file**, with three simple rules.
-> **One:** remove scans where no access point was heard at all. They tell nothing about location. That removed **76**.
-> **Two:** remove **exact duplicates**, because they would just count twice. That removed **634**.
-> **Three:** remove scans with a reading of **−30 dBm or stronger**. That is unrealistically strong, and 430 of these 508 scans came from one single phone, so it looks like a faulty device.
-> So **19,937 scans became 18,719**. We never clean the test set, because in real life you cannot choose which scans users send you.
-> Second, how do we test fairly while choosing settings? We use **cross-validation**: cut the training data into 5 parts, train on 4, test on the 5th, and repeat five times so every part is tested once.
-> The important point is that we split by **user**, not randomly. Each part holds **whole users with their phones**. Some users shared a phone, so we kept them together, and the 18 users became **16 groups**.
-> This table shows why it matters, using the same model. A **random split** promised just **3.67 m** of error, but the **real test** gave **12.52 m**. A random split is too easy, because one person scanned each spot many times, so almost the same scan lands on both sides. Our **user-group split** said 15.87 m, which is a bit stricter, and that is the safe side.
+> We cleaned **only the training data**, with 3 rules: remove **empty** scans, **duplicate** scans, and **impossible** readings.
+> **19,937 → 18,719 scans.** The test set is not touched.
+> To test fairly, we use **cross-validation**: 5 parts, train on 4, test on 1.
+> But we split **by user**, not randomly, so the test part always has **new people and phones**.
+> Why? A random split promised **3.67 m**, but the real test gave **12.52 m**. Random splits lie.
 > Now Agnik will explain the features.
 
 ---

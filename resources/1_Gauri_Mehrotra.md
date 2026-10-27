@@ -1,7 +1,7 @@
 # Gauri Mehrotra (2401010170): Slides 1, 2, 3
 
 **Your part:** opening the talk, explaining the problem, what others did before us (related work), and the gap we found.
-**Time:** about 2.5 minutes.
+**Time:** about 1.5 minutes.
 
 ---
 
@@ -44,35 +44,37 @@ flowchart TB
 
 ## Your script
 
-### Slide 1: Title (about 30 sec)
+> **Remember:** GPS fails indoors → Wi-Fi gives a fingerprint → we predict building, floor, position → two gaps.
+
+### Slide 1: Title (20 sec)
 
 ![Slide 1](slides/slide-01.png)
 
-> Good morning everyone. We are **Team T084** from **Section D**, and our project is **Indoor Location Prediction using Wi-Fi Signals**.
-> I am Gauri Mehrotra, and my teammates are Ansh, Agnik Misra, Kartikey Gupta and Lokendra Singh. Each of us will present one part.
-> This is **Phase 1**, where we use **classical machine learning**: models like kNN, Random Forest and XGBoost. Phase 2 will use deep learning.
+> Good morning. We are **Team T084, Section D**.
+> Our project is **Indoor Location Prediction using Wi-Fi Signals**.
+> I am Gauri, with Ansh, Agnik, Kartikey and Lokendra.
+> This is **Phase 1**, using classical machine learning.
 
-### Slide 2: The problem (about 1 min)
+### Slide 2: The problem (40 sec)
 
 ![Slide 2](slides/slide-02.png)
 
-> We all use GPS on our phones outside, and it works well. But **inside a building GPS works badly**, because walls and roofs block the satellite signals.
-> At the same time, almost every building today has **Wi-Fi**. A phone can hear many Wi-Fi access points at the same time: the ones close by sound loud, and the ones far away sound weak.
-> When a phone checks all the access points around it, we call that one **scan**. The strength of each signal is called **RSSI**, and it is measured in **dBm**. These numbers are negative, and closer to zero means stronger. For example, −40 is strong and −90 is weak.
-> Every spot in a building gives a slightly different pattern of strengths, almost like a **fingerprint**.
-> So from one scan we predict three things. The **building** and the **floor** are categories, so that is **classification**. The exact **(x, y) position** is a number, so that is **regression**.
-> We use the public **UJIIndoorLoc** dataset: 3 university buildings, 520 access points, about 20 thousand training scans and 1,111 test scans.
+> **GPS does not work well inside buildings.** Walls block it.
+> But every building has **Wi-Fi**.
+> A phone hears many Wi-Fi routers: near ones are **loud**, far ones are **weak**.
+> This pattern is like a **fingerprint** of the place.
+> From one scan, we predict the **building**, the **floor** and the **exact position**.
+> Data: **UJIIndoorLoc**, 3 buildings, 520 routers.
 
-### Slide 3: Related work and the gap (about 1 min)
+### Slide 3: Related work and gap (40 sec)
 
 ![Slide 3](slides/slide-03.png)
 
-> Here is what others have done.
-> The classic method is **RADAR**, from Microsoft in 2000. First you record scans at known places. When a new scan comes, you find the most similar stored scans and use their location. That is basically the **kNN** algorithm.
-> The **UJIIndoorLoc** team made this dataset public in 2014 and tested kNN with many distance types. A comparison in 2015 found kNN best, with tree models close behind. From 2017 onwards, people tried **neural networks**: autoencoders, CNNs and shared networks.
-> We found two gaps.
-> **Gap one:** many papers test with a **random split**, which looks too good. One study got 98.2% building-and-floor accuracy on a random split, but only 91.1% on the real test file recorded later. So we use a fairer split, which Ansh will explain.
-> **Gap two:** in our Phase 1, building, floor and position are learned by **three separate models that share nothing**. But Kim and others in 2018 showed that **one shared network** can learn all three on this same data. That is our plan for Phase 2.
+> The classic method is **RADAR (2000)**: find the most similar old scans. That is **kNN**.
+> Later work used trees and neural networks.
+> We found **two gaps**:
+> **One:** random splits look **too good**: 98% versus 91% on the real test.
+> **Two:** our 3 models **learn separately**. One shared network could do better. That is **Phase 2**.
 > Now Ansh will explain the data.
 
 ---

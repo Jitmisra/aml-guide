@@ -1,7 +1,7 @@
 # Lokendra Singh (2401010254): Slides 10, 11
 
 **Your part:** where the final model still makes mistakes (error analysis), the gap, Phase 2, and the closing.
-**Time:** about 2 minutes.
+**Time:** about 1.5 minutes.
 
 ---
 
@@ -67,27 +67,30 @@ flowchart TB
 
 ## Your script
 
-### Slide 10: Where the errors are (about 1 min)
+> **Remember:** building never wrong → floor mistakes rare and only 1 floor off → main problem is exact position → Phase 2 = one shared network.
+
+### Slide 10: Where the errors are (40 sec)
 
 ![Slide 10](slides/slide-10.png)
 
-> Thank you, Kartikey. A total score does not tell us **what to fix**, so we looked at **where** our final Random Forest still makes mistakes on the test set. We split the 1,111 test scans into three cases.
-> **First case: building wrong. Zero scans.** The building is never wrong.
-> **Second case: building right, floor wrong.** Only **7.8%** of the scans. These are costly, at 13.06 m of error, because a wrong floor also confuses the position. But they are rare.
-> **Third case: both right.** That is 92.2% of the scans, at 6.94 m of error. The surprising part is that this case causes **86% of all the error**. So the main problem left is the **fine position on the correct floor**.
-> Two more findings. **81 of the 87 floor mistakes are just one floor off**, up or down, which makes sense because nearby floors hear similar routers. And **new phones are harder**: 8.30 m of error, against 5.84 m on phones seen in training, because different phones measure signal strength a little differently.
+> Thank you, Kartikey. Where does our model still go wrong?
+> **The building is never wrong.**
+> **The floor is wrong only 8% of the time**, and almost always **just one floor off**.
+> **86% of the error** is when the building and floor are **already right**.
+> So the main problem is the **exact position**.
+> Also, **new phones are harder**: 8.30 m, against 5.84 m.
 
-### Slide 11: Phase 2 gap and closing (about 1 min)
+### Slide 11: Phase 2 and closing (40 sec)
 
 ![Slide 11](slides/slide-11.png)
 
-> So, what did Phase 1 show?
-> **One:** AP-affinity, our own feature, helped the most, cutting the error from 15.87 to 11.38 m.
-> **Two:** no single model is best at everything: Random Forest is best for position, and XGBoost is best for floors.
-> **Three:** most of the error is fine position.
-> **The gap:** our three task models are separate and **share nothing**, but the tasks are clearly related. Knowing the floor helps the position, and the other way round. AP-affinity shares that knowledge, but only **by hand**.
-> So in **Phase 2** we will build **one multi-task neural network**: **shared layers** that learn common patterns from the scan, then **three heads** for building, floor and position, so the tasks learn from each other. We will use the **same split, the same test set and the same metrics**, so the comparison with Phase 1 is fair.
-> Thank you! We are happy to take your questions.
+> What did we learn?
+> **AP-affinity helped the most.**
+> **No model is best at everything.**
+> **The gap:** our 3 models **do not share** anything.
+> **Phase 2:** **one neural network** that learns building, floor and position **together**.
+> Same data, same test, so the comparison is **fair**.
+> **Thank you!** We are happy to take questions.
 
 ---
 
