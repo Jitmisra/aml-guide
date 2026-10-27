@@ -1,7 +1,7 @@
 # Lokendra Singh (2401010254): Slides 10, 11
 
 **Your part:** where the final model still makes mistakes (error analysis), the gap, Phase 2, and the closing.
-**Time:** about 2 minutes.
+**Time:** about 1 minute.
 
 ---
 
@@ -69,33 +69,22 @@ flowchart TB
 
 > **Remember:** building never wrong → floor mistakes rare and only 1 floor off → main problem is exact position → Phase 2 = one shared network.
 
-### Slide 10: Where the errors are (1 min)
+### Slide 10: Where the errors are
 
 ![Slide 10](slides/slide-10.png)
 
-> Thank you, Kartikey. A total score does not tell us **what to fix**.
-> So we looked at **where** our Random Forest still goes wrong.
-> **The building is never wrong.** Zero mistakes.
-> **The floor is wrong only 8% of the time.**
-> Those cases have a bigger error, **13 m**, but they are rare.
-> And **81 of 87 floor mistakes are just one floor off**, because nearby floors hear similar routers.
-> The surprise: **86% of the error** is when the building and floor are **already right**.
-> So the main problem is the **exact position on the right floor**.
-> Also, **new phones are harder**: 8.30 m, against 5.84 m on known phones, because phones read signals differently.
+> Thank you, Kartikey. **The building is never wrong.**
+> **The floor is wrong only 8% of the time**, and almost always **just one floor off**.
+> **86% of the error** is when the building and floor are already right, so the main problem is the **exact position**.
+> **New phones are harder**: 8.30 m, against 5.84 m.
 
-### Slide 11: Phase 2 and closing (1 min)
+### Slide 11: Phase 2 and closing
 
 ![Slide 11](slides/slide-11.png)
 
-> So, what did we learn?
-> **One:** AP-affinity, our own idea, helped the most.
-> **Two:** no model is best at everything. Random Forest is best for position, XGBoost for floors.
-> **Three:** most of the error is the exact position.
-> **The gap:** our 3 models **do not share** anything, but the tasks are related.
-> Knowing the floor helps find the position, and the other way round.
-> **Phase 2:** **one neural network** with **shared layers** and **3 outputs**: building, floor and position.
-> So the tasks can **learn from each other**.
-> Same data, same test, same scores, so the comparison is **fair**.
+> **AP-affinity helped most**, and **no model is best at everything**.
+> **The gap:** our 3 models **do not share** anything, though the tasks are related.
+> **Phase 2:** **one neural network** that learns building, floor and position **together**, tested the same way.
 > **Thank you!** We are happy to take questions.
 
 ---

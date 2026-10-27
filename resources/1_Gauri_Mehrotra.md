@@ -1,7 +1,7 @@
 # Gauri Mehrotra (2401010170): Slides 1, 2, 3
 
 **Your part:** opening the talk, explaining the problem, what others did before us (related work), and the gap we found.
-**Time:** about 2 minutes.
+**Time:** about 1.5 minutes.
 
 ---
 
@@ -46,44 +46,31 @@ flowchart TB
 
 > **Remember:** GPS fails indoors → Wi-Fi gives a fingerprint → we predict building, floor, position → two gaps.
 
-### Slide 1: Title (30 sec)
+### Slide 1: Title
 
 ![Slide 1](slides/slide-01.png)
 
-> Good morning. We are **Team T084, Section D**.
-> Our project is **Indoor Location Prediction using Wi-Fi Signals**.
-> I am Gauri, and with me are Ansh, Agnik, Kartikey and Lokendra.
-> Each of us will present one part of the project.
-> This is **Phase 1**, where we use classical machine learning.
-> Models like **kNN, Random Forest and XGBoost**.
-> In Phase 2, we will use **deep learning**.
+> Good morning. We are **Team T084, Section D**, and our project is **Indoor Location Prediction using Wi-Fi Signals**.
+> I am Gauri, with Ansh, Agnik, Kartikey and Lokendra.
+> This is **Phase 1**, using classical machine learning: **kNN, Random Forest and XGBoost**.
 
-### Slide 2: The problem (1 min)
+### Slide 2: The problem
 
 ![Slide 2](slides/slide-02.png)
 
-> We all use GPS outside, and it works well.
-> But **GPS does not work well inside buildings**, because walls and roofs block the signal.
-> But almost every building has **Wi-Fi**.
-> A phone hears many Wi-Fi routers at once: near ones are **loud**, far ones are **weak**.
-> The strength of each signal is called **RSSI**, measured in **dBm**. Closer to zero means stronger.
-> Every spot in a building gives a different pattern, like a **fingerprint**.
-> From one scan, we predict three things: the **building** and the **floor**, which is classification, and the **exact position**, which is regression.
-> Our data is **UJIIndoorLoc**: 3 buildings, 520 routers, about 20,000 scans.
+> **GPS does not work well inside buildings**, because walls block the signal. But every building has **Wi-Fi**.
+> A phone hears many routers: near ones are **loud**, far ones are **weak**. This pattern is like a **fingerprint** of the place.
+> From one scan, we predict the **building**, the **floor** and the **exact position**.
+> Our data: **UJIIndoorLoc**, 3 buildings, 520 routers.
 
-### Slide 3: Related work and gap (1 min)
+### Slide 3: Related work and gap
 
 ![Slide 3](slides/slide-03.png)
 
-> The classic method is **RADAR, from 2000**.
-> Record scans at known places, then for a new scan, find the most similar old scans. That is **kNN**.
-> The UJIIndoorLoc team made this dataset public in 2014.
-> Later studies found kNN works well, with **tree models** close behind.
-> Newer work uses **neural networks**.
-> We found **two gaps**:
-> **One:** many papers use random splits, which look **too good**: 98% versus 91% on the real test.
-> **Two:** our 3 models **learn separately** and share nothing. One shared network could do better.
-> That is our plan for **Phase 2**. Now Ansh will explain the data.
+> The classic method is **RADAR (2000)**: find the most similar old scans. That is **kNN**. Later work used trees and neural networks.
+> **Gap 1:** random splits look **too good**: 98% versus 91% on the real test.
+> **Gap 2:** our 3 models **learn separately**. One shared network could do better. That is **Phase 2**.
+> Now Ansh will explain the data.
 
 ---
 
