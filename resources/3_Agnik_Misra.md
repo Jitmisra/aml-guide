@@ -102,6 +102,7 @@ flowchart LR
 > Floor accuracy also went up, from **78% to 81%**.
 > It helped in **all 5 folds**, not just on average.
 > This was our **biggest gain** in the project.
+> Even **alone, with no model**, AP-affinity gets the building right **99.9%** of the time, with a **14.2 m** error.
 > Honestly, **the stats did not help**. The error went slightly up.
 > We kept them because the full set together was best.
 > Now Kartikey will show the models.
