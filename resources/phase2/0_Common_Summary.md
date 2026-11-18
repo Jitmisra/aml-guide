@@ -109,6 +109,8 @@ flowchart TB
 | Notebooks | 04 and 05 | The network; Phase 1 vs Phase 2 |
 | Tests | pytest | 44 tests in total (Phase 1 + Phase 2) |
 
+Every file, setting, number and figure of the code is explained, with links to the exact lines, in [code_explained](../../code_explained/README.md).
+
 ## 10. Who presents what (Phase 2)
 
 | Slides | Person | Topic |
