@@ -1,7 +1,7 @@
 # Agnik Misra (2401010044): Phase 2 slides 1–2
 
 **Your part:** opening the talk, the step from Phase 1 to Phase 2, what other researchers did with deep learning (the literature), and our two gaps.
-**Time:** about 2.5 minutes.
+**Time:** about 2.5 minutes. Speak slowly; you do not need to read every name on the slide.
 
 ---
 
@@ -86,36 +86,29 @@ What we found (your teammates show it, but you must know it):
 
 ## Your script
 
-> **Remember:** 3 separate models share nothing → one shared network → papers are hard to compare → 2 gaps: a fair test, and hybrids of ML and DL.
+> **Remember:** Phase 1 had 3 separate models → papers say one shared network can help → but it does not always help, and papers are hard to compare → our 2 gaps.
 
 ### Slide 1: Title and team (30 sec)
 
 ![Slide 1](slides/slide-01.png)
 
-> Hello everyone. We are **Team T084, Section D**.
-> Our project is **Indoor Location Prediction Using Wi-Fi Signals**.
-> I am Agnik. With me are **Gauri, Ansh, Kartikey and Lokendra**.
-> This is **Phase 2**, our **deep learning** part.
-> In Phase 1, we used **classical machine learning**.
-> Now we build **one neural network** that learns the **building, floor and position together**.
-> **Multi-task** means one network does several tasks.
-> **Hybrid** means we combine it with our **Phase 1** work.
+> Good morning. We are **Team T084**, and our project is **finding a phone's location indoors using Wi-Fi signals**.
+> I am Agnik, and with me are Gauri, Ansh, Kartikey and Lokendra.
+> In Phase 1 we used classical machine learning. Now, in **Phase 2**, we use **deep learning**.
+> We build **one neural network** that guesses the **building, the floor and the position** at the same time.
 
 ### Slide 2: From Phase 1 to Phase 2: the literature and the gap (2 min)
 
 ![Slide 2](slides/slide-02.png)
 
-> First, a quick look back at **Phase 1**. The **Random Forest** was best on position: **7.42 m**. **XGBoost** got the most floors right: **95.2%**.
-> Our **AP-affinity** features helped the most: the CV error fell from **15.87 to 11.38 m**.
-> But each method used **three separate models** that **share nothing**, although all three describe **one place**. That is the gap in Phase 1.
-> What did other researchers do? The base idea is **multi-task learning**, from **Caruana, 1997**: related tasks, learned together, can **help each other**.
-> In a deep network, this means **shared hidden layers** and **one output layer per task** (Ruder, 2017). **Kim, 2018**, built such a network for **floor and position**.
-> On our dataset, **Laska and Blankenbach, 2022**, got **9.20 m** with a shared network, but **8.25 m** with a **single-task** one. So sharing does **not always** help.
-> Also, numbers are **hard to compare**: one network got **9.52 m** on the official split, but **2.36 m** on a random re-split (**Kargar-Barzi, 2024**).
-> And **Grinsztajn, 2022**, showed that **trees are still strong** on table data.
-> So we found **two gaps**. **Gap 1, a fair comparison:** every tuned setting by **user-group CV**, the test set used **only at the end**, against **tuned trees** and **single-task networks**.
-> **Gap 2, hybrids of ML and DL:** our **AP-affinity** as **network inputs**, and a **blend** with the Random Forest, measured with an **ablation study**.
-> Now **Ansh** will show how a scan becomes the network's inputs.
+> In Phase 1, our best model was the **Random Forest**, with an average error of **7.42 meters**.
+> But we used **three separate models**, one each for building, floor and position. They did not share anything.
+> Research says that **related tasks can help each other** if one network learns them together. This is called **multi-task learning**.
+> But it does not always work. On our same dataset, one study found that **separate networks did better** than a shared one.
+> Results in papers are also **hard to compare**. The same network got 9.5 meters on one data split and 2.4 meters on another.
+> So we found **two gaps**. **First**, a **fair comparison**: we tune everything without touching the test set, and test only once at the end.
+> **Second**, **mixing our Phase 1 work with the network**, and checking honestly if it helps.
+> Now Ansh will show how a Wi-Fi scan becomes the network's input.
 
 ---
 
