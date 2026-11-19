@@ -101,11 +101,11 @@ What we found (your teammates show it, but you must know it):
 
 ![Slide 2](slides/slide-02.png)
 
-> In Phase 1, our best model was the **Random Forest** (**7.42 m** error), but it used **three separate models** that shared nothing.
-> Research says **one network learning related tasks together** can do better. This is **multi-task learning**, but on our dataset it **did not always help**.
-> Paper results are also **hard to compare**, because each one splits the data differently.
-> So our **two gaps**: a **fair test**, using the test set only once at the end, and **mixing Phase 1 with the network**, checked honestly.
-> Now **Ansh** will show how a Wi-Fi scan becomes the network's input.
+> In Phase 1, our best model was the **Random Forest**. On average, its guess was **7.42 meters** away from the real position.
+> But it used **three separate models**: one for the building, one for the floor and one for the position. They never helped each other.
+> Research suggests **one network that learns all three together** can do better. This is called **multi-task learning**. But other papers are hard to compare, because each one tests in a different way.
+> So in Phase 2 we do two things. **One:** we test **fairly**, and use the test data **only once, at the very end**. **Two:** we **combine our Phase 1 work with the network**, and check if it really helps.
+> Now **Ansh** will show what the network takes as input.
 
 ---
 
